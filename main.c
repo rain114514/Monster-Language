@@ -17,8 +17,8 @@ int main() {
 
     Q = GetString(); //获得输入字符串
     flag = CheckString(Q); //合法性检查
-    if (!flag) ErrorPrint(Q, flag); //显示字符串的非法之处
-    else printf("该字符串合法。\n");
+    if (flag != 1) ErrorPrint(Q, flag); //显示字符串的非法之处
+    else printf("The string is legal!\n");
 } //main
 
 QList GetString() {
@@ -71,25 +71,23 @@ void ErrorPrint(QList Q, int E) {
 
     switch (E) {
         case 0: { //输入为空
-            printf("错误：输入为空！\n");
+            printf("Error: EmptyInput!\n");
             break;
         } case -1: { //输入包含非法字符
             while (p != Q->rear && IsLegal(p->data)) {
                 p = p->next;
                 pos++; //找到第一个非法字符
             } //while
-            printf("错误: 输入存在非法字符!\n");
-            printf("第一个非法字符是%c, 在第%d个位置!\n", p->data, pos);
+            printf("Error: Illegal character!\n");
+            printf("The first illegal characher is %c, located at %d!\n", p->data, pos);
             break;
         } case -2: { //输入中包含多重括号
             while (p != Q->rear && Layer <= 1) {
                 if (p->data == '(') Layer++;
                 else if (p->data == ')') Layer--;
                 p = p->next;
-                pos++; //找到第一个被嵌套的左括号
             } //while
-            printf("错误: 输入字符串内括号层数过多!\n");
-            printf("第一个被嵌套的括号在第%d个位置!\n", pos);
+            printf("Error: Too much bracket layer!\n");
             break;
         } case -3: { //输入中存在左括号匹配失败
             while (p != Q->rear) { //寻找第一个匹配失败的左括号
@@ -100,8 +98,8 @@ void ErrorPrint(QList Q, int E) {
                 p = p->next;
                 pos++;
             } //while
-            printf("错误: 输入字符串中有左括号匹配失败!\n");
-            printf("第一个匹配失败的左括号在第%d个位置!\n", Lpos);
+            printf("Error: Unmatched left bracket!\n");
+            printf("The first unmatched left bracket is at %d!\n", Lpos);
             break;
         } case -4: { //输入中存在右括号匹配失败
             while (p != Q->rear) { //寻找第一个匹配失败的右括号
@@ -113,8 +111,8 @@ void ErrorPrint(QList Q, int E) {
                 p = p->next;
                 pos++;
             } //while
-            printf("错误: 输入字符串中有右括号匹配失败!\n");
-            printf("第一个匹配失败的右括号在第%d个位置!\n", pos);
+            printf("Error: Unmatched right bracket!\n");
+            printf("The first unmatched right bracket is at %d!\n", pos);
             break;
         } default: break;
     } //switch
