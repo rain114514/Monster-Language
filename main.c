@@ -10,7 +10,7 @@ QList GetString();
 int IsLegal(char ch);
 int CheckString(QList Q);
 void ErrorPrint(QList Q, int E);
-QList Translate1(QList Q);
+QList PreTranslate(QList Q);
 void Translate(QList Q);
 
 int main() {
@@ -50,22 +50,19 @@ int IsLegal(char ch) {
 int CheckString(QList Q) {
     //对字符串Q进行合法性检验，并返回错误类型
     QNode p = Q->front->next;
-    int Layer = 0, MaxLayer = 0;
+    int Layer = 0;
 
     if (QueueEmpty(Q)) return 0;
     while (p != Q->rear) {
         if (!IsLegal(p->data)) return -1;
-        if (p->data == '(') {
-            Layer++;
-            if (Layer > MaxLayer) MaxLayer = Layer;
-        } else if (p->data == ')') {
+        if (p->data == '(') Layer++;
+        else if (p->data == ')') {
             Layer--;
-            if (Layer < 0) return -4;
+            if (Layer < 0) return -3;
         } //if
         p = p->next;
     } //while
-    if (Layer != 0) return -3;
-    else if (MaxLayer > 1) return -2;
+    if (Layer != 0) return -2;
 
     return 1;
 } //CheckString
@@ -87,15 +84,7 @@ void ErrorPrint(QList Q, int E) {
             printf("Error: Illegal character!\n");
             printf("The first illegal characher is %c, located at %d!\n", p->data, pos);
             break;
-        } case -2: { //输入中包含多重括号
-            while (p != Q->rear && Layer <= 1) {
-                if (p->data == '(') Layer++;
-                else if (p->data == ')') Layer--;
-                p = p->next;
-            } //while
-            printf("Error: Too much bracket layer!\n");
-            break;
-        } case -3: { //输入中存在左括号匹配失败
+        } case -2: { //输入中存在左括号匹配失败
             while (p != Q->rear) { //寻找第一个匹配失败的左括号
                 if (p->data == '(') {
                     if (Layer == 0) Lpos = pos;
@@ -107,7 +96,7 @@ void ErrorPrint(QList Q, int E) {
             printf("Error: Unmatched left bracket!\n");
             printf("The first unmatched left bracket is at %d!\n", Lpos);
             break;
-        } case -4: { //输入中存在右括号匹配失败
+        } case -3: { //输入中存在右括号匹配失败
             while (p != Q->rear) { //寻找第一个匹配失败的右括号
                 if (p->data == '(') Layer++;
                 else if (p->data == ')') {
@@ -124,22 +113,35 @@ void ErrorPrint(QList Q, int E) {
     } //switch
 } //ErrorPrint
 
-QList Translate1(QList Q) {
+QList PreTranslate(QList Q) {
     //翻译字符串Q内的所有括号(不替换魔王词汇)
-    QList NQ;
+    QList NQ, TQ;
     SList S;
     QNode p = Q->front->next;
     char ch, ch0;
+    int Layer = 0;
 
     NQ = InitQueue();
     S = InitStack();
     while (p != Q->rear) {
         if (p->data == '(') { //遇到左括号，开始处理括号
-            ch = p->next->data;
-            p = p->next->next;
-            while (p->data != ')') { //括号结束前
-                Push(S, p->data);
+            Layer++;
+            TQ = InitQueue(); //将括号内的内容装进去
+            p = p->next;
+            while (Layer > 0) {
+                if (p->data == '(') Layer++;
+                else if (p->data == ')') {
+                    Layer--;
+                    if (Layer == 0) break;
+                } //if
+                EnQueue(TQ, p->data);
                 p = p->next;
+            } //while
+            TQ = PreTranslate(TQ); //将括号内的括号也处理掉
+            ch = DeQueue(TQ); //取首位字符
+            while (!QueueEmpty(TQ)) {
+                ch0 = DeQueue(TQ);
+                Push(S, ch0); //剩余字符依次入栈
             } //while
             EnQueue(NQ, ch);
             while (!StackEmpty(S)) { //按规则实现
@@ -147,6 +149,7 @@ QList Translate1(QList Q) {
                 EnQueue(NQ, ch0);
                 EnQueue(NQ, ch);
             } //while
+            DestroyQueue(TQ);
         } else if (IsLegal(p->data)) {
             //不在括号内，直接入队
             EnQueue(NQ, p->data);
@@ -154,6 +157,7 @@ QList Translate1(QList Q) {
         p = p->next;
     } //while
     DestroyQueue(Q); //原先的字符串释放掉
+    DestroyStack(S); //栈也释放掉
 
     return NQ;
 } //Translate1
@@ -163,9 +167,9 @@ void Translate(QList Q) {
     QList NQ;
     QNode p;
 
-    NQ = Translate1(Q);
+    NQ = PreTranslate(Q);
     p = NQ->front->next;
-    while (p != Q->rear) {
+    while (p != NQ->rear) {
         if (p->data >= 'a' && p->data <= 'z') {
             printf("%c", p->data);
         } else if (p->data == 'A') { //替换'A'
