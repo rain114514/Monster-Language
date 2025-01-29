@@ -10,24 +10,22 @@
 2. 判断队列Q是否为空
 3. 将元素x入队
 4. 出队列并返回队头元素值
-5. 直接返回队头元素值
-6. 销毁队列Q
+5. 销毁队列Q
 链栈的基本操作包括：
 1. 创建空栈S
 2. 判断栈S是否为空
 3. 将元素x入栈
 4. 出栈并返回栈顶元素值
-5. 直接返回栈顶元素值
-6. 销毁栈S
+5. 销毁栈S
 */
 
 #include <stdio.h>
 #include <stdlib.h>
 
 typedef struct Node {
-    char data; //数据是单个字符
-    struct Node *next; //链指针
-} Node;
+    char data;
+    struct Node *next;
+} Node; //存储单个字符的链节点
 
 Node *CreateNode() {
     //返回一个空节点
@@ -43,7 +41,7 @@ typedef Node *QNode;
 typedef struct Queue {
     QNode front; //队头
     QNode rear; //队尾
-}Queue, *QList;
+}Queue, *QList; //包含队头队尾的链队列
 
 QList InitQueue() {
     //创建空队列Q并返回
@@ -73,19 +71,14 @@ void EnQueue(QList Q, char x) {
     q->next = p; //将节点插入Q->rear前
 } //EnQueue
 
-char GetFront(QList Q) {
-    //返回非空队列队头元素值
-    if (!QueueEmpty(Q)) return Q->front->next->data;
-} //GetFront
-
 char DeQueue(QList Q) {
-    //返回非空队列队头元素值后将队头节点出栈
+    //返回非空队列Q的队头元素值后将队头节点出队
     QNode p;
     char x;
 
     if (!QueueEmpty(Q)) {
-        x = GetFront(Q);
         p = Q->front->next;
+        x = p->data; //获取队头元素值
         Q->front->next = p->next;
         free(p); //释放队头节点
 
@@ -95,7 +88,7 @@ char DeQueue(QList Q) {
 
 void DestroyQueue(QList Q) {
     //销毁队列Q
-    while (!QueueEmpty(Q)) DeQueue(Q);
+    while (!QueueEmpty(Q)) DeQueue(Q); //逐个释放节点
     free(Q->front);
     free(Q->rear);
     free(Q); //将Q的结构彻底销毁
@@ -105,7 +98,7 @@ typedef Node *SNode;
 
 typedef struct Stack {
     SNode top; //栈顶
-} Stack, *SList;
+} Stack, *SList; //包含栈顶的链栈
 
 SList InitStack() {
     //创建空栈S并返回
@@ -132,20 +125,14 @@ void Push(SList S, char x) {
     p->next = S->top->next;
     S->top->next = p; //将节点插入S->top后
 } //Push
-
-char GetTop(SList S) {
-    //返回非空栈S的栈顶元素值
-    if (!StackEmpty(S)) return S->top->next->data;
-} //GetTop
-
 char Pop(SList S) {
     //返回非空栈S的栈顶元素值后将栈顶节点出栈
     SNode p;
     char x;
 
     if (!StackEmpty(S)) {
-        x = GetTop(S); //获取栈顶元素值
         p = S->top->next;
+        x = p->data; //获取栈顶元素值
         S->top->next = p->next;
         free(p); //释放栈顶节点
 

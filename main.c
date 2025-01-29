@@ -15,14 +15,16 @@ void Translate(QList Q);
 
 int main() {
     //主函数
-    QList Q; //存储字符串
+    QList Q; //用队列存储字符串
     int flag;
 
     Q = GetString(); //获得输入字符串
     flag = CheckString(Q); //合法性检查
     if (flag != 1) ErrorPrint(Q, flag); //显示字符串的非法之处
-    else printf("The string is legal!\n");
-    Translate(Q);
+    else { //字符串合法，进行翻译
+        printf("The string is legal!\n");
+        Translate(Q); //对字符串Q进行翻译并输出
+    } //if
 
     return 0;
 } //main
@@ -52,19 +54,19 @@ int CheckString(QList Q) {
     QNode p = Q->front->next;
     int Layer = 0;
 
-    if (QueueEmpty(Q)) return 0;
+    if (QueueEmpty(Q)) return 0; //输入为空
     while (p != Q->rear) {
-        if (!IsLegal(p->data)) return -1;
+        if (!IsLegal(p->data)) return -1; //非法字符
         if (p->data == '(') Layer++;
         else if (p->data == ')') {
             Layer--;
-            if (Layer < 0) return -3;
+            if (Layer < 0) return -3; //右括号匹配失败
         } //if
         p = p->next;
     } //while
-    if (Layer != 0) return -2;
+    if (Layer != 0) return -2; //左括号匹配失败
 
-    return 1;
+    return 1; //合法
 } //CheckString
 
 void ErrorPrint(QList Q, int E) {
@@ -87,7 +89,7 @@ void ErrorPrint(QList Q, int E) {
         } case -2: { //输入中存在左括号匹配失败
             while (p != Q->rear) { //寻找第一个匹配失败的左括号
                 if (p->data == '(') {
-                    if (Layer == 0) Lpos = pos;
+                    if (Layer == 0) Lpos = pos; //记录最早匹配失败的左括号
                     Layer++;
                 } else if (p->data == ')') Layer--;
                 p = p->next;
@@ -101,7 +103,7 @@ void ErrorPrint(QList Q, int E) {
                 if (p->data == '(') Layer++;
                 else if (p->data == ')') {
                     Layer--;
-                    if (Layer < 0) break;
+                    if (Layer < 0) break; //匹配失败
                 } //if
                 p = p->next;
                 pos++;
@@ -109,8 +111,9 @@ void ErrorPrint(QList Q, int E) {
             printf("Error: Unmatched right bracket!\n");
             printf("The first unmatched right bracket is at %d!\n", pos);
             break;
-        } default: break;
+        } default: break; //其他情况不处理
     } //switch
+    DestroyQueue(Q); //已经非法，直接销毁
 } //ErrorPrint
 
 QList PreTranslate(QList Q) {
@@ -132,26 +135,25 @@ QList PreTranslate(QList Q) {
                 if (p->data == '(') Layer++;
                 else if (p->data == ')') {
                     Layer--;
-                    if (Layer == 0) break;
+                    if (Layer == 0) break; //遇到对应右括号后退出
                 } //if
                 EnQueue(TQ, p->data);
-                p = p->next;
+                p = p->next; //括号内字符依次入子队列
             } //while
-            TQ = PreTranslate(TQ); //将括号内的括号也处理掉
+            TQ = PreTranslate(TQ); //将子串的括号处理掉
             ch = DeQueue(TQ); //取首位字符
             while (!QueueEmpty(TQ)) {
                 ch0 = DeQueue(TQ);
                 Push(S, ch0); //剩余字符依次入栈
             } //while
             EnQueue(NQ, ch);
-            while (!StackEmpty(S)) { //按规则实现
+            while (!StackEmpty(S)) { //按规则翻译
                 ch0 = Pop(S);
                 EnQueue(NQ, ch0);
                 EnQueue(NQ, ch);
             } //while
-            DestroyQueue(TQ);
-        } else if (IsLegal(p->data)) {
-            //不在括号内，直接入队
+            DestroyQueue(TQ); //子队列释放掉
+        } else if (IsLegal(p->data)) { //不在括号内，直接入队
             EnQueue(NQ, p->data);
         } //if
         p = p->next;
