@@ -31,11 +31,9 @@ int main() {
 
 QList GetString() {
     //获取一行内输入的字符串并存储到队列Q
-    QList Q;
-    char ch;
+    QList Q = InitQueue();
+    char ch = getchar();
 
-    Q = InitQueue();
-    ch = getchar();
     while (ch != '\n') {
         EnQueue(Q, ch);
         ch = getchar();
@@ -118,14 +116,12 @@ void ErrorPrint(QList Q, int E) {
 
 QList PreTranslate(QList Q) {
     //翻译字符串Q内的所有括号(不替换魔王词汇)
-    QList NQ, TQ;
-    SList S;
+    QList NQ = InitQueue(), TQ;
+    SList S = InitStack();
     QNode p = Q->front->next;
     char ch, ch0;
     int Layer = 0;
 
-    NQ = InitQueue();
-    S = InitStack();
     while (p != Q->rear) {
         if (p->data == '(') { //遇到左括号，开始处理括号
             Layer++;
