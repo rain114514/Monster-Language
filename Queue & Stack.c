@@ -29,25 +29,26 @@ typedef struct Node {
 
 Node *CreateNode() {
     //返回一个空节点
-    Node *p;
-
-    p = (Node*)malloc(sizeof(Node));
+    Node *p = (Node*)malloc(sizeof(Node));
 
     return p;
 } //CreateNode
 
-typedef Node *QNode;
+typedef Node *QNode, *SNode;
 
 typedef struct Queue {
     QNode front; //队头
     QNode rear; //队尾
 }Queue, *QList; //包含队头队尾的链队列
 
+typedef struct Stack {
+    SNode top; //栈顶
+} Stack, *SList; //包含栈顶的链栈
+
 QList InitQueue() {
     //创建空队列Q并返回
-    QList Q;
+    QList Q = (QList)malloc(sizeof(QNode));
 
-    Q = (QList)malloc(sizeof(QNode));
     Q->front = CreateNode();
     Q->rear = CreateNode();
     Q->front->next = Q->rear; //队空时队头直接链接队尾
@@ -62,13 +63,12 @@ int QueueEmpty(QList Q) {
 
 void EnQueue(QList Q, char x) {
     //将元素x入队Q
-    QNode p, q = Q->front;
+    QNode p = CreateNode(), q = Q->front;
 
-    p = CreateNode();
-    p->data = x; //创捷队列节点
-    while (q->next != Q->rear) q = q->next; //找到队尾前一个节点
+    p->data = x; //创建队列新节点
+    while (q->next != Q->rear) q = q->next; //找到rear前一个节点
     p->next = Q->rear;
-    q->next = p; //将节点插入Q->rear前
+    q->next = p; //将新节点插入Q->rear前
 } //EnQueue
 
 char DeQueue(QList Q) {
@@ -76,7 +76,7 @@ char DeQueue(QList Q) {
     QNode p;
     char x;
 
-    if (!QueueEmpty(Q)) {
+    if (!QueueEmpty(Q)) { //队列非空时执行
         p = Q->front->next;
         x = p->data; //获取队头元素值
         Q->front->next = p->next;
@@ -94,17 +94,11 @@ void DestroyQueue(QList Q) {
     free(Q); //将Q的结构彻底销毁
 } //DestroyQueue
 
-typedef Node *SNode;
-
-typedef struct Stack {
-    SNode top; //栈顶
-} Stack, *SList; //包含栈顶的链栈
 
 SList InitStack() {
     //创建空栈S并返回
-    SList S;
+    SList S = (SList)malloc(sizeof(Stack));
 
-    S = (SList)malloc(sizeof(Stack));
     S->top = CreateNode();
     S->top->next = NULL; //空栈的top指向NULL
 
@@ -118,19 +112,18 @@ int StackEmpty(SList S) {
 
 void Push(SList S, char x) {
     //将字符变量x推入栈S
-    SNode p;
+    SNode p = CreateNode();
 
-    p = CreateNode();
-    p->data = x; //创建栈节点
+    p->data = x; //创建栈新节点
     p->next = S->top->next;
-    S->top->next = p; //将节点插入S->top后
+    S->top->next = p; //将新节点插入S->top后
 } //Push
 char Pop(SList S) {
     //返回非空栈S的栈顶元素值后将栈顶节点出栈
     SNode p;
     char x;
 
-    if (!StackEmpty(S)) {
+    if (!StackEmpty(S)) { //栈非空时执行
         p = S->top->next;
         x = p->data; //获取栈顶元素值
         S->top->next = p->next;
