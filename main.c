@@ -18,13 +18,15 @@ int main() {
     QList Q; //用队列存储字符串
     int flag;
 
-    Q = GetString(); //获得输入字符串
-    flag = CheckString(Q); //合法性检查
-    if (flag != 1) ErrorPrint(Q, flag); //显示字符串的非法之处
-    else { //字符串合法，进行翻译
-        printf("The string is legal!\n");
-        Translate(Q); //对字符串Q进行翻译并输出
-    } //if
+    while (1) {
+        Q = GetString(); //获得输入字符串
+        flag = CheckString(Q); //合法性检查
+        if (flag != 1) ErrorPrint(Q, flag); //显示字符串的非法之处
+        else { //字符串合法，进行翻译
+            printf("The string is legal!\n");
+            Translate(Q); //对字符串Q进行翻译并输出
+        } //if
+    } //while
 
     return 0;
 } //main
