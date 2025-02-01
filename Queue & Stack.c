@@ -32,17 +32,10 @@ typedef struct Queue {
     QNode rear;
 } Queue, *QList; //链式队列定义
 
-Status InitNode(Node *N) {
-    //创建一个空的链节点并返回
-    N = (Node*)malloc(sizeof(Node));
-
-    return OK;
-} //InitNode
-
 Status InitStack(SList S) {
     //创建一个空的链式栈S并返回
     S = (SList)malloc(sizeof(Stack));
-    InitNode(S->top);
+    S->top = (SNode)malloc(sizeof(Node));
     S->top->next = NULL; //空链式栈中，top->next为NULL
 
     return OK;
@@ -62,7 +55,7 @@ Status Push(SList S, Elemtype x) {
     int flag;
 
     if (S == NULL) return ERROR; //链式栈S不存在
-    InitNode(p);
+    p = (SNode)malloc(sizeof(Node));
     p->data = x; //申请新节点
     p->next = S->top->next;
     S->top->next = p; //将新节点p插在top后
@@ -100,8 +93,8 @@ Status DestroyStack(SList S) {
 Status InitQueue(QList Q) {
     //创建一个空的链式队列Q并返回
     Q = (QList)malloc(sizeof(Queue));
-    InitNode(Q->front);
-    InitNode(Q->rear);
+    Q->front = (QNode)malloc(sizeof(Node));
+    Q->rear = (QNode)malloc(sizeof(Node));
     Q->front->next = Q->rear; //空的链式队列中，front->next为rear
 
     return OK;
@@ -120,7 +113,7 @@ Status EnQueue(QList Q, Elemtype x) {
     QNode p, q;
 
     if (Q == NULL) return ERROR; //链式队列Q不存在
-    InitNode(p);
+    p = (QNode)malloc(sizeof(Node));
     p->data = x;
     q = Q->front; //找到rear前一个节点
     while (q->next != Q->rear) q = q->next;
