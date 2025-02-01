@@ -35,7 +35,7 @@ typedef struct Queue {
 Status InitNode(Node *N) {
     //创建一个空的链节点并返回
     N = (Node*)malloc(sizeof(Node));
-    if (N == NULL) return OVERFLOW;
+    if (N == NULL) return OVERFLOW; //申请失败
 
     return OK;
 } //InitNode
@@ -45,7 +45,7 @@ Status InitStack(SList S) {
     S = (SList)malloc(sizeof(SNode));
     if (S == NULL) return OVERFLOW;
     InitNode(S->top); //为栈顶申请空间
-    if (S->top == NULL) return OVERFLOW;
+    if (InitNode(S->top) == OVERFLOW) return OVERFLOW;
     S->top->next = NULL; //空链式栈中，top->next为NULL
 
     return OK;
@@ -102,6 +102,7 @@ Status DestroyStack(SList S) {
     } //while
     free(S->top);
     free(S); //彻底销毁链式栈的结构
+    S = NULL;
 
     return OK;
 } //DestroyStack
