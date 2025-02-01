@@ -15,3 +15,6 @@
 #define UNMATCHEDLEFT -3
 #define UNMATCHEDRIGHT -4
 #define EMPTYBRACKET -5
+
+typedef int Status;
+typedef char Elemtype
