@@ -53,28 +53,18 @@ int CheckString(QList Q) {
         if (!IsLegal(p->data)) return -1; //包含非法字符
         p = p->next;
     } //while
-    p = Q->front->next;
-    while (p != Q->rear) { //检查是否包含多层括号
-        if (p->data == '(') { //左括号
-            if (Layer == 1) return -2; //多层括号
-            Layer++;
-        } else if (p->data == ')') Layer--; //右括号
-        p = p->next;
-    } //while
-    p = Q->front->next;
-    Layer = 0;
     while (p != Q->rear) { //检查是否存在括号匹配失败
         if (p->data == '(') Layer++; //左括号
         else if (p->data == ')') { //右括号
-            if (Layer == 0) return -4; //右括号匹配失败
+            if (Layer == 0) return -3; //右括号匹配失败
             Layer--;
         } //if
         p = p->next;
     } //while
-    if (Layer > 0) return -3; //左括号匹配失败
+    if (Layer > 0) return -2; //左括号匹配失败
     p = Q->front->next;
     while (p->next != Q->rear) { //检查是否存在括号为空
-        if (p->data == '(' && p->next->data == ')') return -5; //存在括号为空
+        if (p->data == '(' && p->next->data == ')') return -4; //存在括号为空
         p = p->next;
     } //while
 
@@ -98,10 +88,7 @@ void ErrorPrint(QList Q, int E) {
             } //while
             printf("The first illegal character is %c, located at %d!\n", p->data, pos);
             break;
-        } case -2: { //字符串包含多层括号
-            printf("Error: Too much layers of brackets!\n");
-            break;
-        } case -3: { //字符串存在匹配失败的左括号
+        } case -2: { //字符串存在匹配失败的左括号
             printf("Error: Unmatched left bracket!\n");
             while (p != Q->rear) { //找到第一个匹配失败的左括号
                 if (p->data == '(') { //左括号
@@ -113,7 +100,7 @@ void ErrorPrint(QList Q, int E) {
             } //while
             printf("The first unmatched left bracket locates at %d!\n", Lpos);
             break;
-        } case -4: { //字符串存在匹配失败的右括号
+        } case -3: { //字符串存在匹配失败的右括号
             printf("Error: Unmatched right bracket!\n");
             while (p != Q->rear) { //找到第一个匹配失败的右括号
                 if (p->data == '(') Layer++; //左括号
@@ -126,7 +113,7 @@ void ErrorPrint(QList Q, int E) {
             } //while
             printf("The first unmatched right bracket locates at %d!\n", pos);
             break;
-        } case -5: { //字符串存在空括号
+        } case -4: { //字符串存在空括号
             printf("Error: Empty brackets!\n");
             while (p->next != Q->rear) { //找到第一个空括号
                 if (p->data == '(' && p->next->data == ')') break;
@@ -142,18 +129,31 @@ void ErrorPrint(QList Q, int E) {
 
 QList PreTranslate(QList Q) {
     //将链队列Q存储的字符串的括号处理掉后返回
-    QList NQ = InitQueue();
-    SList S = InitStack();
+    QList NQ = InitQueue(), TQ;
+    SList S;
     char ch0, ch;
+    int Layer;
 
     while (!QueueEmpty(Q)) { //遍历所有字符
         ch = DeQueue(Q);
         if (ch == '(') { //左括号
-            ch0 = DeQueue(Q);
-            ch = DeQueue(Q);
-            while (ch != ')') { //右括号之前的字符都入栈S
-                Push(S, ch);
+            TQ = InitQueue();
+            S = InitStack();
+            Layer = 1;
+            while (!QueueEmpty(Q) && Layer > 0) { //遇到匹配的右括号之前
                 ch = DeQueue(Q);
+                if (ch == '(') Layer++; //左括号
+                else if (ch == ')') { //右括号
+                    Layer--;
+                    if (Layer == 0) break; //匹配的右括号
+                } //if
+                EnQueue(TQ, ch);
+            } //while
+            TQ = PreTranslate(TQ);
+            ch0 = DeQueue(TQ);
+            while (!QueueEmpty(TQ)) { //括号内的字符都入栈S
+                ch = DeQueue(TQ);
+                Push(S, ch);
             } //while
             EnQueue(NQ, ch0);
             while (!StackEmpty(S)) { //栈S内字符全出栈
@@ -161,10 +161,11 @@ QList PreTranslate(QList Q) {
                 EnQueue(NQ, ch);
                 EnQueue(NQ, ch0);
             } //while
+            DestroyQueue(TQ);
+            DestroyStack(S); //销毁队列Q和栈S
         } else if (ch >= 'a' && ch <= 'z' || ch == 'A' || ch == 'B') EnQueue(NQ, ch); //其他字符直接入队NQ
     } //while
-    DestroyQueue(Q);
-    DestroyStack(S); //销毁队列Q和栈S
+    DestroyQueue(Q); //销毁队列Q
 
     return NQ;
 } //PreTranslate
