@@ -112,7 +112,7 @@ char Pop(SList S) {
 
 void DestroyStack(SList S) {
     //彻底销毁链栈S
-    while (!StackEmpty(S)) Pop(S);
+    while (!StackEmpty(S)) Pop(S); //释放所有节点
     free(S->top);
     S = NULL; //彻底销毁S的结构
 } //DestroyStack
