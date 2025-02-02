@@ -43,7 +43,7 @@ void EnQueue(QList Q, char ch) {
     QNode p = (QNode)malloc(sizeof(Node)), q = Q->front;
 
     p->data = ch; //创建新节点存放ch
-    while (q->next != Q->rear) q = q->next;
+    while (q->next != Q->rear) q = q->next; //找到rear前一个节点
     q->next = p;
     p->next = Q->rear; //将p插入rear前
 } //EnQueue
