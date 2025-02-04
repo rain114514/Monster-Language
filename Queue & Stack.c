@@ -15,19 +15,12 @@ typedef struct Stack { //定义链栈
     SNode top;
 } Stack, *SList;
 
-Node *InitNode() {
-    //返回一个空链节点
-    Node *p = (Node*)malloc(sizeof(Node));
-
-    return p;
-} //InitNode
-
 QList InitQueue() {
     //返回一个空链队列
     QList Q = (QList)malloc(sizeof(Queue));
 
     Q->front = (QNode)malloc(sizeof(Node));
-    Q->rear = (QNode)malloc(sizeof(Node));
+    Q->rear = (QNode)malloc(sizeof(Node)); //申请出链队列的结构
     Q->front->next = Q->rear; //空链队列中, front->next = rear
 
     return Q;
@@ -75,7 +68,7 @@ SList InitStack() {
     //返回一个空链栈
     SList S = (SList)malloc(sizeof(Stack));
 
-    S->top = (SNode)malloc(sizeof(Node));
+    S->top = (SNode)malloc(sizeof(Node)); //申请出链栈的结构
     S->top->next = NULL; //空链栈中, top->next = NULL
 
     return S;
