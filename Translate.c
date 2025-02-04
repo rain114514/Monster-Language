@@ -14,11 +14,11 @@ int main() {
 
     while (1) {
         Q = GetString();
-        F = CheckString(Q);
+        F = CheckString(Q); //检验字符串
         if (F != 1) ErrorPrint(Q, F); //非法字符串
         else { //合法字符串
             printf("The string is legal!\n");
-            Translate(Q);
+            Translate(Q); //翻译
         } //if
     } //while
 
@@ -46,7 +46,7 @@ int IsLegal(char ch) {
 int CheckString(QList Q) {
     //返回链队列Q存储的字符串是否合法
     QNode p = Q->front->next;
-    int Layer = 0;
+    int Layer = 0; //Layer表示未匹配的左括号层数
 
     if (QueueEmpty(Q)) return 0; //字符串为空串
     while (p != Q->rear) { //检查是否包含非法字符
@@ -139,7 +139,7 @@ QList PreTranslate(QList Q) {
         if (ch == '(') { //左括号
             TQ = InitQueue();
             S = InitStack();
-            Layer = 1;
+            Layer = 1; //TQ存储括号内的字符串
             while (!QueueEmpty(Q) && Layer > 0) { //遇到匹配的右括号之前
                 ch = DeQueue(Q);
                 if (ch == '(') Layer++; //左括号
@@ -150,7 +150,7 @@ QList PreTranslate(QList Q) {
                 EnQueue(TQ, ch);
             } //while
             TQ = PreTranslate(TQ);
-            ch0 = DeQueue(TQ);
+            ch0 = DeQueue(TQ); //取出第一个字符
             while (!QueueEmpty(TQ)) { //括号内的字符都入栈S
                 ch = DeQueue(TQ);
                 Push(S, ch);
@@ -182,5 +182,5 @@ void Translate(QList Q) {
         else if (ch == 'B') printf("tsaedsae"); //大写字母B
     } //while
     printf("\nSucceed to translate!\n");
-    DestroyQueue(Q);
+    DestroyQueue(Q); //销毁不再有用的Q
 } //Translate
